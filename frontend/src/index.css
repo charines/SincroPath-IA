@@ -7,11 +7,13 @@
   --color-mist-900: #344541;
   
   --color-orange-500: #f97316;
+  --color-blue-500: #3b82f6;
+  --color-zinc-900: #18181b;
 }
 
 @layer base {
   body {
-    @apply bg-zinc-100 text-zinc-950 font-sans;
+    @apply bg-zinc-100 text-zinc-900 font-sans;
   }
 }
 

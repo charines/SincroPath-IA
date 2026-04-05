@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+backend/venv/
+backend/__pycache__/
+projeto_full_context.txt
+projeto_full_log.txt
