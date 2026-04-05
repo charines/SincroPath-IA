@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --color-mist-50: #f4f7f6;
+  --color-mist-100: #e5edeb;
+  --color-mist-500: #73958d;
+  --color-mist-900: #344541;
+  
+  --color-orange-500: #f97316;
+}
+
+@layer base {
+  body {
+    @apply bg-zinc-100 text-zinc-950 font-sans;
+  }
+}
+
+.react-flow__node {
+  @apply rounded-xl border-zinc-200 shadow-sm bg-white p-0 overflow-hidden;
+}
+
+.react-flow__edge-path {
+  @apply stroke-zinc-400 stroke-2;
+}
+
+.critical-path {
+  @apply stroke-orange-500 stroke-[3px];
+  stroke-dasharray: 5;
+  animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+  from { stroke-dashoffset: 10; }
+  to { stroke-dashoffset: 0; }
+}
