@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-04-05T18:55:58.648419",
+  "status": "FAIL",
+  "database_latency": "1262ms",
+  "ai_response_valid": true,
+  "critical_path_found": true,
+  "errors": [
+    "Alta lat\u00eancia no banco: 1262ms"
+  ]
+}

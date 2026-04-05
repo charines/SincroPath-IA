@@ -5,8 +5,8 @@ from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import google.generativeai as genai
 from dotenv import load_dotenv
+from openai import OpenAI
 import pytz
 
 # Configuração de Banco de Dados real
@@ -20,11 +20,12 @@ print("Tabelas verificadas/criadas com sucesso!")
 
 load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
+openai_api_key = os.getenv("OPENAI_API_KEY")
+if openai_api_key:
+    client = OpenAI(api_key=openai_api_key)
 else:
-    print("AVISO: GEMINI_API_KEY não localizada. O processamento da IA falhará.")
+    client = None
+    print("AVISO: OPENAI_API_KEY não localizada. O processamento da IA falhará.")
 
 app = FastAPI(title="SincroPath-IA Backend")
 
@@ -172,17 +173,30 @@ def create_task(task_data: TaskCreate, db: Session = Depends(get_db)):
 
 @app.post("/api/ingestion/meeting")
 def process_meeting(req: MeetingRequest):
-    if not api_key:
-        return {"suggestedTasks": [{"title": "Ajustar Mocks (Sem API KEY)", "weight": 3, "owner_email": "mock@empresa.com", "project_id": 1}]}
+    if not client:
+        return {"suggestedTasks": [{"title": "Ajustar Mocks (Sem OPENAI API KEY)", "weight": 3, "owner_email": "mock@empresa.com", "project_id": 1}]}
     
     prompt = f"""Atue como um Product Manager sênior analisando uma transcrição bruta de reunião.
-    Sua missão é extrair tarefas tangíveis (To-Dos) do texto. Retorne SOMENTE UM JSON VÁLIDO.
+    Sua missão é extrair tarefas tangíveis (To-Dos) do texto. Retorne um JSON.
     Transcrição para analisar: {req.transcription}"""
     
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt)
-        raw_text = response.text.replace('```json', '').replace('```', '').strip()
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            response_format={"type": "json_object"},
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Você extrai tarefas em JSON Mode. Responda estritamente seguindo o schema: {\"suggestedTasks\": [{\"title\": \"...\", \"weight\": int, \"owner_email\": \"...\", \"project_id\": int}]}. weight de 1 a 13."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+        raw_text = response.choices[0].message.content
         return json.loads(raw_text)
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Erro no processamento Gemini.")
+        print(f"Erro OpenAI: {e}")
+        raise HTTPException(status_code=500, detail="Erro no processamento OpenAI.")

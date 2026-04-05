@@ -73,6 +73,11 @@ const TaskCard = ({ task, onApprove }: { task: Task, onApprove?: (id: number) =>
 
       <h4 className="text-sm font-semibold text-zinc-900 mb-3 line-clamp-2 leading-snug pl-1">
         {task.title}
+        {task.weight > 13 && (
+          <span className="block mt-1 text-[10px] font-black text-white bg-red-600 px-1.5 py-0.5 rounded-sm uppercase tracking-tighter w-fit">
+            ⚠️ WEIGHT EXCEEDED (&gt;13)
+          </span>
+        )}
       </h4>
 
       <div className="flex flex-col mt-auto border-t border-zinc-100 pt-2 pl-1 gap-2">
@@ -459,7 +464,7 @@ export default function App() {
                     <textarea 
                       value={transcription}
                       onChange={(e) => setTranscription(e.target.value)}
-                      placeholder="Cole aqui a transcrição. O Python FastAPI processará usando o Gemini na camada segura..."
+                      placeholder="Cole aqui a transcrição. O Python FastAPI processará usando a OpenAI na camada segura..."
                       className="w-full h-40 bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-mist-500 transition-all resize-none"
                     />
                   </div>
